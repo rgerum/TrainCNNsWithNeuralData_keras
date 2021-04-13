@@ -1,12 +1,10 @@
 import argparse
-from datetime import datetime
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
-from pathlib import Path
 
 from CORNetZ_V import CORNetZV, CosineDistance
-from datagenerator import ImageDataGenerator, MergedGenerators, TrainingHistory
+from datagenerator import ImageDataGenerator, MergedGenerators, TrainingHistory, getOutputPath
 from datagenerator_v import ImageDataGeneratorV
 
 
@@ -37,12 +35,13 @@ def run_net(args):
     print(model_class.summary())
 
     # generate the output path
-    output_path = Path("logs") / (datetime.now().strftime("%Y%m%d-%H%M%S") + " " + " ".join([str(k) + "=" + str(v) for k, v in argp._get_kwargs()]))
+    output_path = getOutputPath(args)
 
     # callbacks
     calbacks = [
         keras.callbacks.ModelCheckpoint(str(output_path / "weights.hdf5"), save_best_only=True, save_weights_only=True),
-        TrainingHistory(output_path)]
+        TrainingHistory(output_path),
+    ]
 
     if args.v != 'None':
         # get the data generator for the images from the neuronal data
@@ -110,14 +109,15 @@ if __name__ == "__main__":
     parser.add_argument('--v', default="V1", help='visual info', choices=['V1', 'V4', 'IT', 'None'])
     parser.add_argument('--num_epochs', default=100, help='number of epochs')
     parser.add_argument('--step', default=100, help='n steps to do v update')
-    parser.add_argument('--r', default=0.1, help='ratio of visual data to run')
+    parser.add_argument('--r', default=0.01, help='ratio of visual data to run')
     parser.add_argument('--img_size', default=227, help='size to crop cif100 images')
     parser.add_argument('--batch_size', default=128, help='the batch size')
     parser.add_argument('--v_batch_size', default=128, help='the v batch size')
     parser.add_argument('--dropout_rate', default=0.5, help='the drop out factor')
     parser.add_argument('--num_classes', default=100, help='the drop out factor')
-    parser.add_argument('--learning_rate', default=0.001)
+    parser.add_argument('--learning_rate', default=0.01)
     parser.add_argument('--r_per_epoch', default=False)
+    parser.add_argument('--output', default='.', help='the output directory')
     argp = parser.parse_args()
 
     run_net(argp)

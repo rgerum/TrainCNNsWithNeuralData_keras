@@ -1,3 +1,5 @@
+import os
+
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
@@ -175,3 +177,41 @@ class TrainingHistory(keras.callbacks.Callback):
         logs["epoch"] = epoch
         self.data.append(logs)
         pd.DataFrame(self.data).to_csv(self.output, index=False)
+
+
+def getGitHash():
+    import subprocess
+    try:
+        short_hash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'])
+        short_hash = str(short_hash, "utf-8").strip()
+        return short_hash
+    except subprocess.CalledProcessError:
+        return ""
+
+def getGitLongHash():
+    import subprocess
+    try:
+        short_hash = subprocess.check_output(['git', 'rev-parse', 'HEAD'])
+        short_hash = str(short_hash, "utf-8").strip()
+        return short_hash
+    except subprocess.CalledProcessError:
+        return ""
+
+
+def getOutputPath(args):
+    from datetime import datetime
+    parts = [
+        datetime.now().strftime("%Y%m%d-%H%M%S"),
+        getGitHash(),
+    ]
+    parts.extend([str(k) + "=" + str(v) for k, v in args._get_kwargs() if k != "output"])
+
+    output = Path(args.output) / "logs" / (" ".join(parts))
+    import yaml
+    output.mkdir(parents=True, exist_ok=True)
+    arguments = dict(datetime=parts[0], commit=parts[1], commitLong=getGitLongHash(), run_dir=os.getcwd())
+    arguments.update(args._get_kwargs())
+    with open(output / "arguments.yaml", "w") as fp:
+        yaml.dump(arguments, fp)
+    print("OUTPUT_PATH=\""+str(output)+"\"")
+    return output
