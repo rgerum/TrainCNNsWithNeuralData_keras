@@ -8,7 +8,7 @@ from pathlib import Path
 class ImageDataGeneratorV(keras.utils.Sequence):
     """Generates data for Keras"""
 
-    def __init__(self, txt_file, mode="training", batch_size=50, img_size=227, shuffle=True, buffer_size=1000, length=None):
+    def __init__(self, txt_file, mode="training", batch_size=50, img_size=227, shuffle=True, buffer_size=1000, length=None, crop=False):
         self.txt_file = txt_file
         files = {"V1": "V1_train.txt", "V4": "V4.txt", "IT": "IT.txt"}
         if txt_file in files:
@@ -29,6 +29,7 @@ class ImageDataGeneratorV(keras.utils.Sequence):
 
         self.img_size = int(img_size)
         self.shuffle = shuffle
+        self.crop = crop
 
         # retrieve the data from the text file
         self._read_txt_file()
@@ -96,16 +97,17 @@ class ImageDataGeneratorV(keras.utils.Sequence):
 
     def imread(self, filename):
         # load and preprocess the image
-        if 0:
+        if self.crop is True:
             img_resized = Image.open(filename).convert('RGB').crop((146, 60, 512, 426))
             img_resized = np.array(img_resized.resize([self.img_size, self.img_size], Image.BILINEAR))
             img_resized = img_resized.astype(np.float32)
-        #img_resized -= 128
-        #img_resized /= 128
         else:
             img_resized = keras.preprocessing.image.load_img(filename, color_mode="rgb",
                                                              target_size=(int(self.img_size), int(self.img_size)),
                                                              interpolation="bilinear")
             img_resized = keras.preprocessing.image.img_to_array(img_resized)
+
+        #img_resized -= 128
+        #img_resized /= 128
 
         return img_resized

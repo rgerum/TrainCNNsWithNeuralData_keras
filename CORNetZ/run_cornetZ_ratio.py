@@ -38,14 +38,17 @@ def run_net(args):
     output_path = getOutputPath(args)
 
     # callbacks
-    calbacks = [
-        keras.callbacks.ModelCheckpoint(str(output_path / "weights.hdf5"), save_best_only=True, save_weights_only=True),
-        TrainingHistory(output_path),
-    ]
+    if args.no_log is False:
+        calbacks = [
+            keras.callbacks.ModelCheckpoint(str(output_path / "weights.hdf5"), save_best_only=True, save_weights_only=True),
+            TrainingHistory(output_path),
+        ]
+    else:
+        callbacks = []
 
     if args.v != 'None':
         # get the data generator for the images from the neuronal data
-        v_data = ImageDataGeneratorV(args.v, batch_size=args.v_batch_size, length=len(tr_data))
+        v_data = ImageDataGeneratorV(args.v, batch_size=args.v_batch_size, length=len(tr_data), crop=args.crop)
 
         # take two images as input
         img1 = tf.keras.layers.Input([args.img_size, args.img_size, 3], name="img1")
@@ -116,7 +119,9 @@ if __name__ == "__main__":
     parser.add_argument('--dropout_rate', default=0.5, type=float, help='the drop out factor')
     parser.add_argument('--num_classes', default=100, type=int, help='the drop out factor')
     parser.add_argument('--learning_rate', default=0.01, type=float)
-    parser.add_argument('--r_per_epoch', default=False, type=bool)
+    parser.add_argument('--r_per_epoch', default=False, action='store_true')
+    parser.add_argument('--crop', default=False, action='store_true', help='crop the monkey images')
+    parser.add_argument('--no-log', default=False, action='store_true', help='omit output (for testing)')
     parser.add_argument('--output', default='.', help='the output directory')
     argp = parser.parse_args()
 
