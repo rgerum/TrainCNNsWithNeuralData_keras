@@ -8,7 +8,8 @@ from pathlib import Path
 class ImageDataGeneratorV(keras.utils.Sequence):
     """Generates data for Keras"""
 
-    def __init__(self, txt_file, mode="training", batch_size=50, img_size=227, shuffle=True, buffer_size=1000, length=None, crop=False):
+    def __init__(self, txt_file, mode="training", batch_size=50, img_size=227, shuffle=True, buffer_size=1000,
+                 length=None, crop=False, center=False, scale=False):
         self.txt_file = txt_file
         files = {"V1": "V1_train.txt", "V4": "V4.txt", "IT": "IT.txt"}
         if txt_file in files:
@@ -30,6 +31,8 @@ class ImageDataGeneratorV(keras.utils.Sequence):
         self.img_size = int(img_size)
         self.shuffle = shuffle
         self.crop = crop
+        self.center = center
+        self.scale = scale
 
         # retrieve the data from the text file
         self._read_txt_file()
@@ -107,7 +110,9 @@ class ImageDataGeneratorV(keras.utils.Sequence):
                                                              interpolation="bilinear")
             img_resized = keras.preprocessing.image.img_to_array(img_resized)
 
-        #img_resized -= 128
-        #img_resized /= 128
+        if self.center is True:
+            img_resized -= 128
+        if self.scale is True:
+            img_resized /= 128
 
         return img_resized

@@ -206,7 +206,7 @@ def getOutputPath(args):
     ]
     parts.extend([str(k) + "=" + str(v) for k, v in args._get_kwargs() if k != "output"])
 
-    output = Path(args.output) / "logs" / (" ".join(parts))
+    output = Path(args.output) / (" ".join(parts))
     import yaml
     output.mkdir(parents=True, exist_ok=True)
     arguments = dict(datetime=parts[0], commit=parts[1], commitLong=getGitLongHash(), run_dir=os.getcwd())

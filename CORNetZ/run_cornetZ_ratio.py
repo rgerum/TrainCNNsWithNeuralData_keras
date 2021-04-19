@@ -48,7 +48,7 @@ def run_net(args):
 
     if args.v != 'None':
         # get the data generator for the images from the neuronal data
-        v_data = ImageDataGeneratorV(args.v, batch_size=args.v_batch_size, length=len(tr_data), crop=args.crop)
+        v_data = ImageDataGeneratorV(args.v, batch_size=args.v_batch_size, length=len(tr_data), crop=args.crop, center=args.v_center, scale=args.v_scale)
 
         # take two images as input
         img1 = tf.keras.layers.Input([args.img_size, args.img_size, 3], name="img1")
@@ -121,8 +121,10 @@ if __name__ == "__main__":
     parser.add_argument('--learning_rate', default=0.01, type=float)
     parser.add_argument('--r_per_epoch', default=False, action='store_true')
     parser.add_argument('--crop', default=False, action='store_true', help='crop the monkey images')
+    parser.add_argument('--v_center', default=False, action='store_true', help='whether to substract the mean of the monkey images')
+    parser.add_argument('--v_scale', default=False, action='store_true', help='whether to scale of the monkey images')
     parser.add_argument('--no-log', default=False, action='store_true', help='omit output (for testing)')
-    parser.add_argument('--output', default='.', help='the output directory')
+    parser.add_argument('--output', default='logs', help='the output directory')
     argp = parser.parse_args()
 
     run_net(argp)
