@@ -39,7 +39,7 @@ def run_net(args):
 
     # callbacks
     if args.no_log is False:
-        calbacks = [
+        callbacks = [
             keras.callbacks.ModelCheckpoint(str(output_path / "weights.hdf5"), save_best_only=True, save_weights_only=True),
             TrainingHistory(output_path),
         ]
@@ -99,12 +99,12 @@ def run_net(args):
         training_input2 = MergedGenerators(val_data, v_data, use_min_length=True)
 
         # the initial epochs with teacher
-        model_both.fit(training_input, validation_data=training_input2, shuffle=False, epochs=10, callbacks=[CustomCallback(training_input)]+calbacks)
+        model_both.fit(training_input, validation_data=training_input2, shuffle=False, epochs=10, callbacks=[CustomCallback(training_input)]+callbacks)
         # the rest of the epochs without a teacher
-        model_class.fit(tr_data, validation_data=val_data, epochs=args.num_epochs, callbacks=calbacks, initial_epoch=10)
+        model_class.fit(tr_data, validation_data=val_data, epochs=args.num_epochs, callbacks=callbacks, initial_epoch=10)
     else:
         # train without teacher signal
-        model_class.fit(tr_data, validation_data=val_data, epochs=args.num_epochs, callbacks=calbacks)
+        model_class.fit(tr_data, validation_data=val_data, epochs=args.num_epochs, callbacks=callbacks)
 
 
 if __name__ == "__main__":
