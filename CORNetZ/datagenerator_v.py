@@ -13,7 +13,7 @@ class ImageDataGeneratorV(keras.utils.Sequence):
         self.txt_file = txt_file
         files = {"V1": "V1_train.txt", "V4": "V4.txt", "IT": "IT.txt"}
         if txt_file in files:
-            self.txt_file = Path("data/V1") / files[txt_file]
+            self.txt_file = Path(__file__).parent / Path("data/V1") / files[txt_file]
 
         if not Path(self.txt_file).exists():
             from urllib.request import urlopen

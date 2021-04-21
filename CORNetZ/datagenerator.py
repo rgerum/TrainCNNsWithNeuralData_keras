@@ -17,7 +17,7 @@ CIF100_MEAN = np.array([129.3, 124.1, 112.4], dtype=np.float32)
 class ImageDataGenerator(keras.utils.Sequence):
     """Generates data for Keras"""
 
-    def __init__(self, txt_file, batch_size, num_classes, img_size=227, shuffle=True):
+    def __init__(self, txt_file, batch_size, num_classes, img_size=227, shuffle=True, scale=False):
         """Create a new ImageDataGenerator.
 
         Receives a path string to a text file, which consists of many lines,
@@ -37,7 +37,7 @@ class ImageDataGenerator(keras.utils.Sequence):
             ValueError: If an invalid mode is passed.
 
         """
-        self.txt_file = Path("data/CIFAR100") / txt_file
+        self.txt_file = Path(__file__).parent / Path("data/CIFAR100") / txt_file
 
         if not Path(self.txt_file).exists():
             from urllib.request import urlopen
@@ -55,6 +55,7 @@ class ImageDataGenerator(keras.utils.Sequence):
         self.num_classes = num_classes
         self.img_size = img_size
         self.shuffle = shuffle
+        self.scale = scale
 
         # retrieve the data from the text file
         self._read_txt_file()
@@ -118,7 +119,8 @@ class ImageDataGenerator(keras.utils.Sequence):
                                                          interpolation="bilinear")
         img_resized = keras.preprocessing.image.img_to_array(img_resized)
         img_resized -= CIF100_MEAN
-        #img_resized /= 128
+        if self.scale:
+            img_resized /= 128
 
         # RGB -> BGR
         img_resized = img_resized[:, :, ::-1]

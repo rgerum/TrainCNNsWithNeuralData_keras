@@ -14,9 +14,9 @@ def run_net(args):
 
     # data
     tr_data = ImageDataGenerator("train.txt",
-                     img_size=args.img_size, batch_size=args.batch_size, num_classes=args.num_classes, shuffle=True)
+                     img_size=args.img_size, batch_size=args.batch_size, num_classes=args.num_classes, shuffle=True, scale=args.scale)
     val_data = ImageDataGenerator("val.txt",
-                     img_size=args.img_size, batch_size=args.batch_size, num_classes=args.num_classes, shuffle=False)
+                     img_size=args.img_size, batch_size=args.batch_size, num_classes=args.num_classes, shuffle=False, scale=args.scale)
 
     # the input image from the
     img = tf.keras.layers.Input([args.img_size, args.img_size, 3], name="img")
@@ -123,6 +123,7 @@ if __name__ == "__main__":
     parser.add_argument('--crop', default=False, action='store_true', help='crop the monkey images')
     parser.add_argument('--v_center', default=False, action='store_true', help='whether to substract the mean of the monkey images')
     parser.add_argument('--v_scale', default=False, action='store_true', help='whether to scale of the monkey images')
+    parser.add_argument('--scale', default=False, action='store_true', help='whether to scale of the cifar100 images')
     parser.add_argument('--no-log', default=False, action='store_true', help='omit output (for testing)')
     parser.add_argument('--output', default='logs', help='the output directory')
     argp = parser.parse_args()
